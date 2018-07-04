@@ -1,5 +1,5 @@
 from django.shortcuts import render
 
 def home(request):
-    return render(request, 'appointments/home.html')
+    return render(request, 'home/login.html')
 
