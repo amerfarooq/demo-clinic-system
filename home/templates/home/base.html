@@ -6,14 +6,18 @@
 	{% endblock %}
 		
 	<meta charset="utf-8" />
+
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type = "text/css"/>
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/mycss.css' %}" type = "text/css"/>
+	{% load static %}
+	<script src="{% static "js/util.js" %}"></script>
 	
 </head>
 
 <body class="body" style="background-color:#f6f6f6">
 	<div class="container-fluid" style="min-height:95%; ">
-		
-		<!-- <img src="{% static "images/calendar_icon.png" %}" class="img-fluid rounded float-left" alt="Calendar Icon"  -->
-		<!-- style="width:100px;height:100px;"/> -->
 		
 		<br>
 		{% block pageHeading%}

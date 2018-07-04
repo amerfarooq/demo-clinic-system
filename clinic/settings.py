@@ -31,14 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-<<<<<<< HEAD
-    'supervisor',
     'home',
+    'supervisor',
     'widget_tweaks',
-=======
-    'home',
-    'supervisor',
->>>>>>> d76348c66e890f50a36685a9bcd5d131fa64d9fa
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -137,6 +137,27 @@ Django also provides a mechanism for collecting static files into one place so t
 
 
 
+### Creating a login page in Django:
+
+---
+
+ 
+
+Django includes an authentication system by default. To make use of it, we can edit the main urls.py as follows:
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+from django.contrib.auth import views as auth_view	#this needs to be imported
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', auth_view.login, name = 'login' ),
+]
+```
+
+Here we are telling Django that when the user visits site.com, they should be displayed the login portal. To achieve this, Django looks for a login.html file in a directory named registration.
+
 
 
 
