@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{% block pageTitle %}
+	{% endblock %}
+		
+	<meta charset="utf-8" />
+	
+</head>
+
+<body class="body" style="background-color:#f6f6f6">
+	<div class="container-fluid" style="min-height:95%; ">
+		
+		<!-- <img src="{% static "images/calendar_icon.png" %}" class="img-fluid rounded float-left" alt="Calendar Icon"  -->
+		<!-- style="width:100px;height:100px;"/> -->
+		
+		<br>
+		{% block pageHeading%}
+		{% endblock %}
+		
+	
+		<br>
+			{% block content %}
+			{% endblock %}	
+	</div>
+
+</body>
+
+</html>

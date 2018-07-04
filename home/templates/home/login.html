@@ -1,0 +1,105 @@
+{% extends "home/base.html" %}
+{% load widget_tweaks %}    
+
+{% block pagetitle %}
+    <title>Login</title>
+{% endblock%}
+
+
+{% block pageHeading %}
+    <h3 align="center">Login portal</h3>
+{% endblock %}
+
+
+{% block content %}
+<br><br>
+
+{% if next %}
+    {% if user.is_authenticated %}
+        <p>Your account doesn't have access to this page. To proceed,
+        please login with an account that has access.</p>
+    {% else %}
+        <p>Please login to see this page.</p>
+    {% endif %}
+{% endif %}
+
+<form method="POST" >
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="btn-centered alert alert-danger" role="alert">
+            {% for error in form.non_field_errors %}
+            {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <br><br>
+
+    <!-- <div class="col-lg-3 col-centered">                              
+        <div class="form-group">
+    <div>
+        <td>{{ form.username.label_tag }}</td>
+        <td>{% render_field form.username class="form-control" %}</td>
+      </div>
+    <br>
+    <div>
+        <td>{{ form.password.label_tag }}</td>
+        <td>{% render_field form.password class="form-control"%}</td>
+    </div>
+    <br>
+    <div>
+        <label for="userType">Role:</label>
+            <select class="form-control" id="userType">
+                <option>Supervisor</option>
+                <option>Doctor</option>
+                <option>Front-Desk</option>
+            </select>
+     </div> -->
+
+     
+    {% for field in form.visible_fields %}
+    <div class="col-lg-4 col-centered">                             
+        <div class="form-group">
+            
+            {{ field.label_tag }}
+
+            {% if form.is_bound %}
+                {% if field.errors %}
+                    {% render_field field class="form-control is-invalid" %}                                                 
+                        {% for error in field.errors %}                                           
+                            <div class="invalid-feedback">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                {% else %}
+                    {% render_field field class="form-control is-valid" %}
+                {% endif %} 
+            
+            {% else %}        
+                {% render_field field class="form-control" %}
+            {% endif %}
+
+            {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+         
+         </div>
+     </div>
+    {% endfor %}
+
+
+    <br>
+    <div class="btn-centered">
+        <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+
+        </div>
+    </div>
+
+    <br><br>
+</form>
+
+<!-- <div class="btn-centered">
+    <a href="/register">New user? Register!</a>
+</div> -->
+{% endblock %}
