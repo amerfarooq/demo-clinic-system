@@ -141,7 +141,7 @@ Django also provides a mechanism for collecting static files into one place so t
 
 ---
 
- 
+
 
 Django includes an authentication system by default. To make use of it, we can edit the main urls.py as follows:
 
@@ -156,9 +156,124 @@ urlpatterns = [
 ]
 ```
 
-Here we are telling Django that when the user visits site.com, they should be displayed the login portal. To achieve this, Django looks for a login.html file in a directory named registration.
+Here we are telling Django that when the user visits site.com, they should be displayed the login portal. To achieve this, Django looks for a directory named registration inside the template folders located in the project and searches for a login.html file. It passes this file the registration form which can then be rendered. The login.html file can render the form like so:
+
+```django
+{% for field in form.visible_fields %}
+<div class="col-lg-4 col-centered">                             
+    <div class="form-group">
+
+        {{ field.label_tag }}
+
+        {% if form.is_bound %}
+            {% if field.errors %}
+                {% render_field field class="form-control is-invalid" %}                       
+                {% for error in field.errors %}                                           
+                    <div class="invalid-feedback">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+        
+            {% else %}
+                {% render_field field class="form-control is-valid" %}
+            {% endif %} 
+
+        {% else %}        
+        	{% render_field field class="form-control" %}
+        {% endif %}
+
+        {% if field.help_text %}
+        	<small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+
+    </div>
+</div>
+{% endfor %}
+
+
+<br>
+<div class="btn-centered">
+    <button type="submit" class="btn btn-primary">Login</button>
+</div>
+
+```
+
+An explanation for how this works can be found [here](https://simpleisbetterthancomplex.com/article/2017/08/19/how-to-render-django-form-manually.html).
+
+Users can be added manually by going to the Users tab in the admin panel.
 
 
 
+### Redirecting a user after logging in:
+
+---
 
 
+
+By default, Django redirects a user to accounts/profile when they login i.e. `site.com/accounts/profile.` To change this, the `settings.py` file can be edited to add a custom path like so:
+
+```python
+LOGIN_REDIRECT_URL = '/example'
+```
+
+Now when the user logs in, they will automatically be redirected to `site.com/example`
+
+
+
+### How to show more reader-friendly object names in the admin panel:
+
+---
+
+
+
+By default, objects created via the admin interface usually have names like `Doctor Object (1)`  for a Doctor model. To change this, a method can be added to the Doctor model in `models.py` like so:
+
+```python
+class Doctor(models.Model):
+    doctor_name = models.CharField(max_length=128)
+
+    DOC_SPECIALITIES = (
+        ('ACCU', 'ACCU'),
+        ('Chiro', 'Chiro'),
+        ('Medical', 'Medical'),
+        ('PT', 'PT'),
+    )
+    doctor_speciality = models.CharField(max_length=20, choices=DOC_SPECIALITIES, 		default='PT')
+
+    def __str__(self):
+        return f'{self.doctor_name} - {self.doctor_speciality}'
+
+```
+
+This will show up new Doctor objects as "Doctor Name Speciality" e.g. `Amer Farooq - Chiro` 
+
+
+
+### How to populate a drop-down menu using data from models:
+
+---
+
+For example, if you have a drop down menu on your web page that shows a list of all the clinics, how can you populate that menu using data from your Clinic model.
+
+To do so,  edit the view that renders your webpage in `views.py` like so:
+
+```python
+def manageDoctors(request):
+    clinics = Clinic.objects.all()
+    return render(request, 'supervisor/manage-doctors.html', {'clinics' : clinics})
+```
+
+Here, all the Clinic objects in the database are being passed to the `manage-doctors.html` page in a dictionary. Then inside the `manage-doctors.html` page, we can display them like so:
+
+```django
+<form method="POST">
+    <label>Select Clinic</label>
+    <select id="clinic-select">
+        {% for clinic in clinics %}
+        	<option>{{ clinic.clinic_name }}</option>
+        {% endfor %}
+    </select>
+</form>
+```
+
+Here we are simply looping over the Clinic objects and inserting them into the webpage inside `option` tags. This loop is a construct of Jinja2, a templating engine that is included in Django. It's documentation can be found [here](http://jinja.pocoo.org/docs/2.10/). 

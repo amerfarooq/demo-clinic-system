@@ -1,0 +1,78 @@
+{% extends "supervisor/base.html" %}
+{% load widget_tweaks %}  
+
+{% block pageTitle %}
+    <title>Manage Doctors</title>
+{% endblock %}
+
+{% block pageHeading %}
+    <h4 align="center">Manage availibility of doctors for different clinics</h4>
+    <hr>
+{% endblock %}
+
+{% block content %}
+
+<!-- FIXME: Make forms appear vertically -->
+<div style="display: flex; justify-content: space-evenly">
+    
+    <form class="col-lg-2 input-group" method="POST">
+        <div class="form-group">
+            <label>Select Speciality</label>
+            <select class="form-control pull-right" id="speciality-select" onchange="getVal()">
+                <option>Medical</option>
+                <option>ACCU</option>
+                <option>PT</option>
+                <option>Chiro</option>
+            </select>
+        </div>
+    </form>
+
+    <form class="col-lg-2 input-group" method="POST">
+        <div class="form-group">
+            <label>Select Clinic</label>
+            <select multiple class="form-control pull-right" id="clinic-select">
+                {% for clinic in clinics %}
+                    <option>{{ clinic.clinic_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <div class="wrap-table100">
+        <div class="table">
+
+            <div class="row header">
+                <div class="cell">
+                    Doctor
+                </div>
+                {% for clinic in clinics %}
+                <div class="cell">
+                    {{ clinic.clinic_name }}
+                </div>
+                {% endfor %}
+            </div>
+
+            {% for doc in doctors %}
+            <div class="row">
+                <div class="cell" data-title="Full Name">
+                    {{ doc.doctor_name }}
+                </div>
+                {% for clinic in clinics %}
+                    <div class="cell" data-title="Full Name">      <!-- TODO: Center align checkboxes -->
+                        <input type="checkbox" />
+                    </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    function generateTable() {
+        let spec = document.getElementById("speciality-select").value;
+    }
+</script>
+
+{% endblock %}	

@@ -23,7 +23,7 @@
     {% endif %}
 {% endif %}
 
-<form method="POST" >
+<form method="POST">
     {% csrf_token %}
 
     {% if form.non_field_errors %}
@@ -33,9 +33,9 @@
             {% endfor %}
         </div>
     {% endif %}
-    <br><br>
+    <br>
 
-    <!-- <div class="col-lg-3 col-centered">                              
+    <div class="col-lg-3 col-centered">                              
         <div class="form-group">
     <div>
         <td>{{ form.username.label_tag }}</td>
@@ -54,10 +54,9 @@
                 <option>Doctor</option>
                 <option>Front-Desk</option>
             </select>
-     </div> -->
+     </div>
 
-     
-    {% for field in form.visible_fields %}
+    <!-- {% for field in form.visible_fields %}
     <div class="col-lg-4 col-centered">                             
         <div class="form-group">
             
@@ -85,9 +84,9 @@
          
          </div>
      </div>
-    {% endfor %}
+    {% endfor %} -->
 
-
+    <br>
     <br>
     <div class="btn-centered">
         <button type="submit" class="btn btn-primary">Login</button>
@@ -99,7 +98,4 @@
     <br><br>
 </form>
 
-<!-- <div class="btn-centered">
-    <a href="/register">New user? Register!</a>
-</div> -->
 {% endblock %}

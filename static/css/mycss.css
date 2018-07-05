@@ -1,0 +1,13 @@
+.col-centered{
+    margin: 0 auto;
+    float: none;
+}
+
+.btn-centered{ 
+    text-align: center; 
+}
+
+.col-right{
+    margin: 0 auto;
+    float : right;
+}
