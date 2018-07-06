@@ -1,16 +1,26 @@
-{% extends "supervisor/base.html" %} {% load widget_tweaks %} {% block pageTitle %}
-<title>Manage Doctors</title>
-{% endblock %} {% block pageHeading %}
-<h4 align="center">Manage availibility of doctors for different clinics</h4>
-<hr> {% endblock %} {% block content %}
+{% extends "supervisor/base.html" %} 
+{% load widget_tweaks %} 
 
+{% block pageTitle %}
+    <title>Manage Doctors</title>   
+{% endblock %} 
+
+{% block pageHeading %}
+    <h4 align="center">Manage availibility of doctors for different clinics</h4>
+    <hr> 
+{% endblock %} 
+
+
+{% block content %}
 <div style="display: flex; justify-content: space-evenly">
-
     <div style="width: 20rem" >
+        
+        <!-- Speciality select drop down -->
         <form class="col-lg-15 input-group">
             <div class="form-group">
                 <label>Select Speciality</label>
                 <select class="form-control pull-right" id="speciality-select">
+                    <option disabled selected value id="def-val-spec"> --- </option>
                     <option>Medical</option>
                     <option>ACCU</option>
                     <option>PT</option>
@@ -18,62 +28,63 @@
                 </select>
             </div>
         </form>
+        <br>
 
+        <!-- Clinic select drop-down -->
         <form class="col-lg-15 input-group">
             <div class="form-group">
                 <label>Select Clinic</label>
                 <select class="form-control pull-right" id="clinic-select">
+                    <option id="def-val-clinic" disabled selected value> --- </option>
                     {% for clinic in clinics %}
                         <option>{{ clinic.clinic_name }}</option>
                     {% endfor %}
                 </select>
             </div>
         </form>
+        <br>
 
+        <!-- Selected Clinics list -->
         <div class="card" style="width: 18rem;">
             <div class="card-header">
             Selected Clinics
             </div>
 
-            <ul class="list-group list-group-flush">
-            {% for clinic in clinics %}
-                <li class="list-group-item">{{ clinic.clinic_name }}
-                    <span class="badge badge-danger badge-pill pull-right">-</span>
-                </li>
-            {% endfor %}   
-             
+            <ul class="list-group list-group-flush" id="clinic_list">
             </ul>
         </div>
+
+        <br>
+        <!-- Submit Button -->
+        <button type="button" class="btn btn-outline-primary">Assign Doctors</button>
     </div>
 
+    <!-- Doctor Table -->
     <div class="wrap-table100">
         <div class="table">
 
-            <div class="row header">
+            <div class="row header" id="heading">
                 <div class="cell">
                     Doctor
                 </div>
-                {% for clinic in clinics %}
-                <div class="cell">
-                    {{ clinic.clinic_name }}
-                </div>
-                {% endfor %}
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %} 
-{% block scripts %}
 
+
+{% block scripts %}
 <script>
     
+    var speciality = '';
+    // Adding doctors when speciality changes
     $(document).ready(function () {
         $("#speciality-select").change(function (event) {
-
+            $("#def-val-spec").remove();    // removes default --- option from drop down list
             $('.row').not(':first').remove(); // Remove all table rows except the row headings
             event.preventDefault();          // prevent default action when button changes 
-            var speciality = $("#speciality-select option:selected").text(); // get the selected speciality
+            speciality = $("#speciality-select option:selected").text(); // get the selected speciality
 
             $.ajax({
                 type: 'GET',
@@ -81,7 +92,7 @@
 
                 success: function (json) {
                     var doctors = JSON.parse(json.doctors);
-                    render_table(doctors, speciality);
+                    add_doctors(doctors, speciality);
                 },
 
                 error: function () {
@@ -90,24 +101,94 @@
             })
         });
     });
-
-    function render_table(doctors, spec) {
+    
+    var doctorsArr = [];
+    function add_doctors(doctors, spec) {
         for (let i = 0; i < doctors.length; ++i) {
-            if (doctors[i].fields.doctor_speciality == spec)
-                insert_doctor_row(doctors[i].fields.doctor_name);
+            let doc_name = doctors[i].fields.doctor_name;
+
+            if (doctors[i].fields.doctor_speciality == spec) {
+                insert_doctor_row(doc_name);
+            }
+            if (!doctorsArr.includes(doc_name)) {
+                doctorsArr.push({ 'name':doc_name, 'spec':doctors[i].fields.doctor_speciality});
+            }
+        }
+    }
+    function insert_doctor_row(doctor_name) {
+        let checkbox_str = '';
+
+        for(let i = 0; i < clinics.length; ++i) {
+            checkbox_str += '<div class="cell">' +
+            '<input type="checkbox">'+
+            '</div>'
+        }
+
+          $(".table").append(
+            '<div class="row">' +
+            '<div class="cell">' +
+            doctor_name +
+            "</div>" +
+            checkbox_str
+        )
+    }
+ 
+    let clinics = [];
+    // When clinic selected, table is reloaded
+    $(document).ready(function () {
+        $("#clinic-select").change(function(event) {
+            $("#def-val-clinic").remove();
+
+            var selected_clinic = $("#clinic-select option:selected").text();
+            
+            for(let i = 0; i < clinics.length; ++i) {
+                if (clinics[i] == selected_clinic)
+                    return;
+            }
+            clinics.push(selected_clinic);
+
+            $("#clinic_list").append(
+                '<li class="list-group-item list-group-item-action">' +
+                selected_clinic +
+                '<span class="badge badge-danger badge-pill pull-right">-</span>' +
+                "</li>"
+            )
+
+            $("#heading").append(
+                '<div class="cell">' +
+                selected_clinic +
+                '</div>'
+            )
+            reDrawTable(doctorsArr, clinics);  
+        });
+    });
+    
+    function reDrawTable(doctors, clinics) {
+        $('.row').not(':first').remove();
+      
+        for (let i = 0; i < doctorsArr.length; ++i) {
+            console.log(doctorsArr[i]['spec'] + "against" + speciality);
+
+            if (doctorsArr[i]['spec'] != speciality)
+                continue;
+                
+            let checkbox_str = '';
+
+            for (let j = 0; j < clinics.length; ++j) {
+                checkbox_str += '<div class="cell">' +
+                '<input type="checkbox">'+
+                '</div>'
+            }
+           
+            $(".table").append(
+                '<div class="row">' +
+                '<div class="cell">' +
+                doctorsArr[i]['name'] +
+                "</div>" +
+                checkbox_str
+            )
         }
     }
 
-    function insert_doctor_row(doctor_name) {
-        $(".table").append(
-            '<div class="row">' +
-            '<div class="cell" data-title="Full Name">' +
-            doctor_name +
-            "</div>" +
-            "</div>"
-        )
-    }
-
 </script>
-
 {% endblock %}
