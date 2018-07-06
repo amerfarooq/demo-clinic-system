@@ -1,42 +1,46 @@
-{% extends "supervisor/base.html" %}
-{% load widget_tweaks %}  
+{% extends "supervisor/base.html" %} {% load widget_tweaks %} {% block pageTitle %}
+<title>Manage Doctors</title>
+{% endblock %} {% block pageHeading %}
+<h4 align="center">Manage availibility of doctors for different clinics</h4>
+<hr> {% endblock %} {% block content %}
 
-{% block pageTitle %}
-    <title>Manage Doctors</title>
-{% endblock %}
-
-{% block pageHeading %}
-    <h4 align="center">Manage availibility of doctors for different clinics</h4>
-    <hr>
-{% endblock %}
-
-{% block content %}
-
-<!-- FIXME: Make forms appear vertically -->
 <div style="display: flex; justify-content: space-evenly">
-    
-    <form class="col-lg-2 input-group" method="POST">
-        <div class="form-group">
-            <label>Select Speciality</label>
-            <select class="form-control pull-right" id="speciality-select" onchange="getVal()">
-                <option>Medical</option>
-                <option>ACCU</option>
-                <option>PT</option>
-                <option>Chiro</option>
-            </select>
-        </div>
-    </form>
 
-    <form class="col-lg-2 input-group" method="POST">
-        <div class="form-group">
-            <label>Select Clinic</label>
-            <select multiple class="form-control pull-right" id="clinic-select">
-                {% for clinic in clinics %}
-                    <option>{{ clinic.clinic_name }}</option>
-                {% endfor %}
-            </select>
+    <div style="width: 20rem" >
+        <form class="col-lg-2 input-group">
+            <div class="form-group">
+                <label>Select Speciality</label>
+                <select class="form-control pull-right" id="speciality-select">
+                    <option>Medical</option>
+                    <option>ACCU</option>
+                    <option>PT</option>
+                    <option>Chiro</option>
+                </select>
+            </div>
+        </form>
+
+        <form class="col-lg-2 input-group">
+            <div class="form-group">
+                <label>Select Clinic</label>
+                <select multiple class="form-control pull-right" id="clinic-select">
+                    {% for clinic in clinics %}
+                        <option>{{ clinic.clinic_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        <div class="card" style="width: 18rem;">
+            <div class="card-header">
+            Selected Clinics
+            </div>
+            <ul class="list-group list-group-flush">
+            <li class="list-group-item">Cras justo odio</li>
+            <li class="list-group-item">Dapibus ac facilisis in</li>
+            <li class="list-group-item">Vestibulum at eros</li>
+            </ul>
         </div>
-    </form>
+    </div>
 
     <div class="wrap-table100">
         <div class="table">
@@ -51,28 +55,55 @@
                 </div>
                 {% endfor %}
             </div>
-
-            {% for doc in doctors %}
-            <div class="row">
-                <div class="cell" data-title="Full Name">
-                    {{ doc.doctor_name }}
-                </div>
-                {% for clinic in clinics %}
-                    <div class="cell" data-title="Full Name">      <!-- TODO: Center align checkboxes -->
-                        <input type="checkbox" />
-                    </div>
-                {% endfor %}
-            </div>
-            {% endfor %}
-            
         </div>
     </div>
 </div>
 
+{% endblock %} 
+{% block scripts %}
+
 <script>
-    function generateTable() {
-        let spec = document.getElementById("speciality-select").value;
+    
+    $(document).ready(function () {
+        $("#speciality-select").change(function (event) {
+
+            $('.row').not(':first').remove(); // Remove all table rows except the row headings
+            event.preventDefault();          // prevent default action when button changes 
+            var speciality = $("#speciality-select option:selected").text(); // get the selected speciality
+
+            $.ajax({
+                type: 'GET',
+                url: 'get_doctors/',
+
+                success: function (json) {
+                    var doctors = JSON.parse(json.doctors);
+                    render_table(doctors, speciality);
+                },
+
+                error: function () {
+                    alert("Error!");
+                }
+            })
+        });
+    });
+
+    function render_table(doctors, spec) {
+        for (let i = 0; i < doctors.length; ++i) {
+            if (doctors[i].fields.doctor_speciality == spec)
+                insert_doctor_row(doctors[i].fields.doctor_name);
+        }
     }
+
+    function insert_doctor_row(doctor_name) {
+        $(".table").append(
+            '<div class="row">' +
+            '<div class="cell" data-title="Full Name">' +
+            doctor_name +
+            "</div>" +
+            "</div>"
+        )
+    }
+
 </script>
 
-{% endblock %}	
+{% endblock %}
