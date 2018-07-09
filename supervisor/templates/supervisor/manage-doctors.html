@@ -8,10 +8,16 @@
 {% block pageHeading %}
     <h4 align="center">Manage availibility of doctors for different clinics</h4>
     <hr> 
-{% endblock %} 
+    {% endblock %} 
 
 
 {% block content %}
+    <!-- <div class="container" id="success-alert">
+                <div class="alert alert-success" role="alert">
+            Doctors have been assigned!
+        </div>
+    </div> -->
+
 <div style="display: flex; justify-content: space-evenly">
     <div style="width: 20rem" >
         
@@ -19,7 +25,7 @@
         <form class="col-lg-15 input-group">
             <div class="form-group">
                 <label>Select Speciality</label>
-                <select class="form-control pull-right" id="speciality-select">
+                <select class="form-control" id="speciality-select">
                     <option disabled selected value id="def-val-spec"> --- </option>
                     <option>Medical</option>
                     <option>ACCU</option>
@@ -45,7 +51,7 @@
         <br>
 
         <!-- Selected Clinics list -->
-        <div class="card" style="width: 18rem;">
+        <div class="card" style="width: 14rem;">
             <div class="card-header">
             Selected Clinics
             </div>
@@ -56,27 +62,26 @@
 
         <br>
         <!-- Submit Button -->
-        <button type="button" class="btn btn-outline-primary">Assign Doctors</button>
+        <button type="button" id="assign-docs" class="btn btn-outline-primary">Assign Doctors</button>  
     </div>
-
+  
     <!-- Doctor Table -->
     <div class="wrap-table100">
         <div class="table">
 
             <div class="row header" id="heading">
-                <div class="cell">
-                    Doctor
-                </div>
+                <div class="cell">Doctor</div>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %} 
 
 
 {% block scripts %}
 <script>
-    
+  
     var speciality = '';
     // Adding doctors when speciality changes
     $(document).ready(function () {
@@ -85,7 +90,7 @@
             $('.row').not(':first').remove(); // Remove all table rows except the row headings
             event.preventDefault();          // prevent default action when button changes 
             speciality = $("#speciality-select option:selected").text(); // get the selected speciality
-
+            
             $.ajax({
                 type: 'GET',
                 url: 'get_doctors/',
@@ -102,6 +107,7 @@
         });
     });
     
+    // Adds doctors of selected speciality to the table
     var doctorsArr = [];
     function add_doctors(doctors, spec) {
         for (let i = 0; i < doctors.length; ++i) {
@@ -110,16 +116,104 @@
             if (doctors[i].fields.doctor_speciality == spec) {
                 insert_doctor_row(doc_name);
             }
+            if (doctorsArr.length == doctors.length) {
+                continue;
+            }
             if (!doctorsArr.includes(doc_name)) {
                 doctorsArr.push({ 'name':doc_name, 'spec':doctors[i].fields.doctor_speciality});
             }
         }
     }
+    // Inserts a row in the table containing doctor name and check boxes
+
+    var clinics = [];
+    // When clinic selected, table is reloaded
+   
+    var clinic_list_index = 1;
+    $(document).ready(function () {
+            $("#clinic-select").change(function(event) {
+            
+                $("#def-val-clinic").remove();
+
+                var selected_clinic = $("#clinic-select option:selected").text();
+                
+                if (clinics.includes(selected_clinic)) 
+                    return;
+            
+                clinics.push(selected_clinic);
+            
+                $("#clinic_list").append(
+                    '<li data-clinic="' + selected_clinic.toString() + 
+                    '" class="list-group-item list-group-item-action " id="clinic-li-'+ (clinic_list_index).toString() + '">' +
+                    selected_clinic + 
+                    '<button class =' + '"button button-circle button-caution button-tiny float-right rem-btn"' + 
+                    ' type="button"' + 
+                    'data-id="' + clinic_list_index.toString() + '">' +
+                    '<i class="fas fa-times"></i>' +
+                    "</li>"
+                )
+
+                $(".rem-btn").click(function () {
+                    var li_id = $(this).attr('data-id');
+                    var clinicName = $("#clinic-li-" + li_id.toString()).attr('data-clinic');
+                    clinics.splice(clinics.indexOf(clinicName), 1);
+                    $("#clinic-li-" + li_id.toString()).remove();   // removing clinic from Selected Clinics list
+                    $("#clinic-col-" + li_id.toString()).remove();  // removing clinic heading from table
+                    
+                    if (clinicName == "G-10/2") {
+                        $('.G-10-2').remove();
+                    }
+                    else if (clinicName == "Blue Area") {
+                        $('.Blue-Area').remove();
+                    }
+                    else if (clinicName == "F-10") {
+                        $('.F-10').remove(); 
+                    }
+                });
+
+                $("#heading").append(
+                    '<div class="cell"' + 
+                    'id="clinic-col-' + clinic_list_index.toString() + 
+                    '" data-id="' + clinic_list_index.toString() + '">' +
+                    selected_clinic +
+                    '</div>'
+                )
+                clinic_list_index++;
+
+                redraw_table(doctorsArr);  
+            });
+    });
+    
+    function redraw_table(doctors) {
+        $('.row').not(':first').remove();
+        
+        for (let i = 0; i < doctorsArr.length; ++i) {
+            if (doctorsArr[i]['spec'] != speciality)
+                continue;
+                
+            insert_doctor_row(doctorsArr[i]['name']);
+        }
+    }
+
     function insert_doctor_row(doctor_name) {
         let checkbox_str = '';
 
         for(let i = 0; i < clinics.length; ++i) {
-            checkbox_str += '<div class="cell">' +
+
+            let class_attr = "";
+            if (clinics[i] == "G-10/2") {
+                class_attr = "G-10-2";
+            }
+            else if (clinics[i] == "Blue Area") {
+                class_attr = "Blue-Area";
+            }
+            else {
+                class_attr = "F-10";
+            }
+
+            checkbox_str += '<div class="cell ' +
+            class_attr + '" ' +
+            'data-clinic-name="' + clinics[i] + '">' +
             '<input type="checkbox">'+
             '</div>'
         }
@@ -132,63 +226,30 @@
             checkbox_str
         )
     }
- 
-    let clinics = [];
-    // When clinic selected, table is reloaded
+
     $(document).ready(function () {
-        $("#clinic-select").change(function(event) {
-            $("#def-val-clinic").remove();
-
-            var selected_clinic = $("#clinic-select option:selected").text();
+        $("#assign-docs").click(function(e) {
             
-            for(let i = 0; i < clinics.length; ++i) {
-                if (clinics[i] == selected_clinic)
-                    return;
-            }
-            clinics.push(selected_clinic);
+            $(".cell input:checked").each(function() {
+                let clinic = $(this).parent().attr('data-clinic-name');
+                let doc = $(this).parent().parent().first().text();
 
-            $("#clinic_list").append(
-                '<li class="list-group-item list-group-item-action">' +
-                selected_clinic +
-                '<span class="badge badge-danger badge-pill pull-right">-</span>' +
-                "</li>"
-            )
-
-            $("#heading").append(
-                '<div class="cell">' +
-                selected_clinic +
-                '</div>'
-            )
-            reDrawTable(doctorsArr, clinics);  
+                $.ajax({
+                    type: 'POST',
+                    url: 'assign_doctor/',
+                    data: {
+                        name: doc,
+                        clinic: clinic,
+                    }
+                });
+            });
+            $('input[type=checkbox]').prop('checked',false);
+            dialog.alert({
+                message: "Assignments performed succesfully",
+                animation: "fade",
+            });
         });
     });
-    
-    function reDrawTable(doctors, clinics) {
-        $('.row').not(':first').remove();
-      
-        for (let i = 0; i < doctorsArr.length; ++i) {
-            console.log(doctorsArr[i]['spec'] + "against" + speciality);
-
-            if (doctorsArr[i]['spec'] != speciality)
-                continue;
-                
-            let checkbox_str = '';
-
-            for (let j = 0; j < clinics.length; ++j) {
-                checkbox_str += '<div class="cell">' +
-                '<input type="checkbox">'+
-                '</div>'
-            }
-           
-            $(".table").append(
-                '<div class="row">' +
-                '<div class="cell">' +
-                doctorsArr[i]['name'] +
-                "</div>" +
-                checkbox_str
-            )
-        }
-    }
 
 </script>
 {% endblock %}

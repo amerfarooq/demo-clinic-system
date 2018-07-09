@@ -106,7 +106,7 @@ python manage.py createsuperuser
 Django will then prompt you for a username and password which can then be used to login by visiting `yoursite.com/admin` 
 
 
-
+<a name="static-tut"></a>
 ### How to add HTML pages to a Django app
 
 ---
@@ -364,9 +364,7 @@ The documentation for these can be found [here](https://api.jquery.com/category/
 
 ----
 
-This can be done by navigating to the `views.py` file which contains the view you want to restrict access to.
-
-Then add the following code which imports Django's built-in [view decorator](https://docs.djangoproject.com/en/2.0/topics/http/decorators/) and uses it to mark views that only logged-in users can access.
+This can be done by navigating to the `views.py` file which contains the view you want to restrict access to. Then add the following code which imports Django's built-in [view decorator](https://docs.djangoproject.com/en/2.0/topics/http/decorators/) and uses it to mark views that only logged-in users can access.
 
 ```python
 from django.contrib.auth.decorators import login_required
@@ -383,4 +381,295 @@ LOGIN_URL = '/<your url here>'
 ```
 
 
+<a name="clinic-dropdown"></a>
+### Showing a dropdown of clinics for user to select from:
+
+---
+
+This is done using [Bootstrap forms](https://getbootstrap.com/docs/4.1/components/forms/#form-controls). The example is edited and added as follows:
+
+```html
+ <form class="col-lg-15 input-group">
+     <div class="form-group">
+         <label>Select Clinic</label>
+         <select class="form-control" id="clinic-select">
+             <option id="def-val-clinic" disabled selected value> --- </option>
+             {% for clinic in clinics %}
+             	<option>{{ clinic.clinic_name }}</option>
+             {% endfor %}
+         </select>
+     </div>
+</form>
+```
+
+`<option id="def-val-clinic" disabled selected value> --- </option>`  is used to set  `---` as the default value. Since we are performing actions whenever the value in this form changes, setting up a default value is necessary. We give this option an id to be able to remove it later from the form.
+
+Next, we simply loop over the clinics array and use the clinic name inside the option tags to create the dropdown list. This array is being passed in the `manageDoctors`  view inside `supervisor/views.py` .
+
+```python
+def manageDoctors(request):
+    clinics = Clinic.objects.all()
+    doctors = Doctor.objects.all()
+    return render(request, 'supervisor/manage-doctors.html', {'clinics':clinics, 'doctors':doctors})
+```
+
+
+<a name="list"></a>
+### Showing a list of selected clinics:
+
+---
+
+To display this list we use [Bootstrap cards with a list group](https://getbootstrap.com/docs/4.1/components/card/#list-groups).  The following `div` is added to the body of the page. List items are appended through JS and JQuery.
+
+```html
+<div class="card" style="width: 14rem;">
+    <div class="card-header">
+        Selected Clinics
+    </div>
+
+    <ul class="list-group list-group-flush" id="clinic_list">
+    </ul>
+</div>
+```
+
+
+
+###  Adding a clinic to the selected clinic list:
+
+---
+
+To add a clinic to the above list, the following JQuery / Javascript code is used:
+
+```javascript
+let clinics = [];
+var clinic_list_index = 1;
+
+ $(document).ready(function () {
+        $("#clinic-select").change(function(event) {
+           
+            $("#def-val-clinic").remove();
+            var selected_clinic = $("#clinic-select option:selected").text();
+            
+            if (clinics.includes(selected_clinic)) 
+                return;
+           
+            clinics.push(selected_clinic);
+           
+            $("#clinic_list").append(
+                '<li data-clinic="' + selected_clinic.toString() + 
+                '" class="list-group-item list-group-item-action " id="clinic-li-'+ 						(clinic_list_index).toString() + '">' +
+                selected_clinic + 
+                '<button class=' + '"button button-circle button-caution button-tiny float-					right"' + 
+                ' type="button" id="rem-btn-' + clinic_list_index.toString() + 
+                '" data-id="' + clinic_list_index.toString() + '">' +
+                '<i class="fas fa-times"></i>' +
+                "</li>"
+            )
+            
+            $("#heading").append(
+                '<div class="cell">' +
+                selected_clinic +
+                '</div>'
+            )
+            clinic_list_index++;
+            reDrawTable(doctorsArr, clinics);  
+        });
+    });
+```
+
+Lets break it down.
+
+
+
+`$("#clinic-select").change(function(event)` 
+
+ Here we are specifying that whenever the user selects a new clinic from the dropdown list created [here](#clinic-dropdown), call the following function.
+
+
+
+
+`$("#def-val-clinic").remove()`
+
+  Remove the default `---` value from the dropdown list.
+
+   
+
+```javascript
+if (clinics.includes(selected_clinic)) 
+    return;
+
+clinics.push(selected_clinic);
+```
+
+Here we check if the clinic has already been selected by using JavaScript's `includes()` function on the clinics array. If it hasn't, we add it to the array.
+
+
+
+`var selected_clinic = $("#clinic-select option:selected").text()` 
+
+This stores the clinic that the user selected in the `selected_clinic` variable.
+
+
+
+   ```html
+$("#clinic_list").append(
+    '<li data-clinic="' + selected_clinic.toString() + 
+        '" class="list-group-item list-group-item-action" id="clinic-li-'+ 						(clinic_list_index).toString() + '">' +
+        selected_clinic + 
+        '<button class=' + '"button button-circle button-caution button-tiny 						float-right"' + 
+         ' type="button" id="rem-btn-' + clinic_list_index.toString() + 
+         '" data-id="' + clinic_list_index.toString() + '">' +
+        '<i class="fas fa-times"></i>' +
+    "</li>"
+   )
+   ```
+
+Next, we append the selected clinic to the `clinic-list` list group we made [earlier](#list). To do so we create a list item and add some classes to it.
+
+ `data-clinic` is a data attribute that stores the name of the clinic so that we can use it later to remove that particular clinic from the `clincs` array. Data attributes are user defined attributes used for holding some information. You can read more about them [here](https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes). 
+
+`class="list-group-item list-group-item-action"` are the classes referencing the Bootstrap list group.
+
+`id="clinic-li-'+ (clinic_list_index).toString() + '">'`  This line assigns an id to the list item. We are using a counter called `clinic_list_index` to assign each clinic list item a unique id and this is being done so that we can remove this clinic list item when the user presses the 'x' button. This is detailed ahead.
+
+The remaining code simply adds an 'x' button next to the clinic name. This is also explained in more detail in the following section. 
+
+This particular line though is important: `'type="button" id="rem-btn-' + clinic_list_index.toString()`  Here we are assigning the created button a unique id as well so that we assign a click event handler to it later. 
+
+ `'data-id="' + clinic_list_index.toString()'`  Here we are storing the current value of `clinic_list_index` in the data-id attribute. This is because `clinic_list_index ` is incremented whenever a clinic is added to the list and we need its current value to be able to remove the clinic item when the user presses the 'x' button. The section detailing with the deletion will clear things up more regarding its need and use.
+
+
+
+### Adding a small red cross button next to a listed clinic:
+
+---
+
+To show this <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKqlc56McqhIG5cr242_H1CLzAIy-n_UbNPcyoCtvGBqza4szp" alt="drawing" width="20px"/> button next to a listed clinic we require two CSS libraries.
+
+1. [Buttons](http://unicorn-ui.com/buttons/) - for the small circular button
+2. [Font Awesome](https://fontawesome.com/icons/times?style=solid) - for the 'x' icon
+
+These can be added directly via CDN or by downloading them and adding them to the CSS folder inside the main `static/css` . Instructions for doing this can be found in the earlier part of this documentation [here](#static-tut). The HTML code for the button is as follows:
+
+```html
+<button class="button button-circle button-caution button-tiny float-right">
+    <i class="fas fa-times"></i>
+</button>
+```
+
+The button classes are referenced from the preceding Buttons link. The `float-right` class is part of Bootstrap and is used here to pull the button to the far right side of the clinic name. The `<i class="fas fa-times"></i>` references the 'x' icon and is taken from [here](https://fontawesome.com/icons/times?style=solid).
+
+
+
+### Deleting a clinic when the user presses the 'x' button:
+
+---
+
+To accomplish this, a counter is used to assign the clinic and its corresponding 'x' button the same id. This counter is `var clinic_list_index = 1 ` .  The delete functionality is added into the code fence of the <u>*'Adding a clinic to the selected clinic list'*</u>  section.  The edited code block will be as follows:
+
+```javascript
+ var clinic_list_index = 1;
+    $(document).ready(function () {
+            $("#clinic-select").change(function(event) {
+            
+                $("#def-val-clinic").remove();
+
+                var selected_clinic = $("#clinic-select option:selected").text();
+                
+                if (clinics.includes(selected_clinic)) 
+                    return;
+            
+                clinics.push(selected_clinic);
+            
+                $("#clinic_list").append(
+                    '<li data-clinic="' + selected_clinic.toString() + 
+                    '" class="list-group-item list-group-item-action " id="clinic-li-'+ 						(clinic_list_index).toString() + '">' +
+                    selected_clinic + 
+                    '<button class =' + '"button button-circle button-caution button-tiny 						float-right rem-btn"' + 
+                    ' type="button"' + 
+                    'data-id="' + clinic_list_index.toString() + '">' +
+                    '<i class="fas fa-times"></i>' +
+                    "</li>"
+                )
+                
+			   //------------
+                // New section
+                //------------
+                $(".rem-btn").click(function () {
+                    var li_id = $(this).attr('data-id');
+                    var clinicName = $("#clinic-li-" + li_id.toString()).attr('data-clinic');
+                    clinics.splice(clinics.indexOf(clinicName), 1);
+                    $("#clinic-li-" + li_id.toString()).remove();   // removing clinic from 					Selected Clinics list
+                    $("#clinic-col-" + li_id.toString()).remove();  // removing clinic 							heading from table
+                    
+                    if (clinicName == "G-10/2") {
+                        $('.G-10-2').remove();
+                    }
+                    else if (clinicName == "Blue Area") {
+                        $('.Blue-Area').remove();
+                    }
+                    else if (clinicName == "F-10") {
+                        $('.F-10').remove(); 
+                    }
+                });
+
+                $("#heading").append(
+                    '<div class="cell"' + 
+                    'id="clinic-col-' + clinic_list_index.toString() + 
+                    '" data-id="' + clinic_list_index.toString() + '">' +
+                    selected_clinic +
+                    '</div>'
+                )
+                clinic_list_index++;
+                redraw_table(doctorsArr);  
+            });
+    });
+```
+
+
+
+The first aspect of the deletion functionality is in this particular block of code:
+
+```javascript
+$("#clinic_list").append(
+    '<li data-clinic="' + selected_clinic.toString() + 
+    '" class="list-group-item list-group-item-action " id="clinic-li-'+ 					(clinic_list_index).toString() + '">' +
+    selected_clinic + 
+    '<button class =' + '"button button-circle button-caution button-tiny 					float-right rem-btn"' + 
+    ' type="button"' + 
+    'data-id="' + clinic_list_index.toString() + '">' +
+    '<i class="fas fa-times"></i>' +
+    "</li>"
+ )
+```
+
+Whenever we add a new clinic to the 'Selected Clinics' list, we give it an id: `id="clinic-li-'+ 						(clinic_list_index).toString()` . Similarly, we also give the 'x' button a data-id: `'data-id="' + clinic_list_index.toString() `  and class
+
+
+
+
+
+
+
+The new functionality in particular is this:
+
+```javascript
+$(".rem-btn").click(function () {
+    var li_id = $(this).attr('data-id');
+    var clinicName = $("#clinic-li-" + li_id.toString()).attr('data-clinic');
+    clinics.splice(clinics.indexOf(clinicName), 1);
+    $("#clinic-li-" + li_id.toString()).remove();   // removing clinic from 					Selected Clinics list
+    $("#clinic-col-" + li_id.toString()).remove();  // removing clinic 							heading from table
+
+    if (clinicName == "G-10/2") {
+        $('.G-10-2').remove();
+    }
+    else if (clinicName == "Blue Area") {
+        $('.Blue-Area').remove();
+    }
+    else if (clinicName == "F-10") {
+        $('.F-10').remove(); 
+    }
+});
+```
 
