@@ -7,17 +7,11 @@
 
 {% block pageHeading %}
     <h4 align="center">Manage availibility of doctors for different clinics</h4>
-    <hr> 
-    {% endblock %} 
+    <hr>
+{% endblock %} 
 
 
 {% block content %}
-    <!-- <div class="container" id="success-alert">
-                <div class="alert alert-success" role="alert">
-            Doctors have been assigned!
-        </div>
-    </div> -->
-
 <div style="display: flex; justify-content: space-evenly">
     <div style="width: 20rem" >
         
@@ -81,7 +75,26 @@
 
 {% block scripts %}
 <script>
-  
+    var ajax_doctors;
+    $(document).ready(function () {
+
+        $.ajax({
+            type: 'GET',
+            url: 'get_doctors/',
+
+            success: function (json) {
+                ajax_doctors = JSON.parse(json.doctors);
+            },
+
+            error: function () {
+                dialog.alert({
+                    message: "Error! Doctors could not be fetched!",
+                    animation: "fade",
+                });
+            }
+        })
+    });
+
     var speciality = '';
     // Adding doctors when speciality changes
     $(document).ready(function () {
@@ -90,20 +103,7 @@
             $('.row').not(':first').remove(); // Remove all table rows except the row headings
             event.preventDefault();          // prevent default action when button changes 
             speciality = $("#speciality-select option:selected").text(); // get the selected speciality
-            
-            $.ajax({
-                type: 'GET',
-                url: 'get_doctors/',
-
-                success: function (json) {
-                    var doctors = JSON.parse(json.doctors);
-                    add_doctors(doctors, speciality);
-                },
-
-                error: function () {
-                    alert("Error!");
-                }
-            })
+            add_doctors(ajax_doctors, speciality);
         });
     });
     
@@ -179,7 +179,6 @@
                     '</div>'
                 )
                 clinic_list_index++;
-
                 redraw_table(doctorsArr);  
             });
     });
@@ -243,7 +242,8 @@
                     }
                 });
             });
-            $('input[type=checkbox]').prop('checked',false);
+            
+            $('input[type=checkbox]').prop('checked', false);   // uncheck all checkboxes in the table
             dialog.alert({
                 message: "Assignments performed succesfully",
                 animation: "fade",
