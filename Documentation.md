@@ -147,8 +147,6 @@ STATICFILES_DIRS = (
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 ```
 
-
-
 The `STATICFILES_DIRS` tuple tells Django where to look for static files that are not particular to an app. In this case, we just told Django to also look for static files in a folder called `static` in our root folder, not just in our apps.
 
 Django also provides a mechanism for collecting static files into one place so that they can be served easily. Using the `collectstatic` command, Django looks for all static files in your apps and collects them wherever you told it to, i.e. the `STATIC_ROOT`. In our case, we are telling Django that when we run `python manage.py collectstatic`, gather all static files into a folder called `staticfiles` in our project root directory. This feature is very handy for serving static files, especially in production settings.
@@ -717,7 +715,17 @@ First, navigate to p
 
     Now click on the **Save** button or use CTRL + S. Then, navigate back to your apps configuration page  and click on the `reload <app>` button at the top.
 
-9. 
+9. Next, get your application domain from your configuration page e.g. `testcalendar.pythonanywhere.com` Now, open the **Files** tab in the pythonanywhere dashboard and navigate to your application's `settings.py` file. Here, add the copied domain to the `ALLOWED_HOSTS` so it looks like: 
 
-   
+   ```python
+   ALLOWED_HOSTS = ['your-domain.pythonanywhere.com']
+   ```
+
+10. Reload your app again and then try to open the web application through the above domain. If you end up on an error page, check the error logs to see what went wrong and rectify the issue from there. 
+
+11. When your application finally opens, you will see your web page but without any sort of styling. To fix this, head over to the bash console and type `python manage.py collectstatic`. This will collect all your static files in the `STATIC_ROOT` directory that was defined in the ***How to add HTML pages to a Django app***. 
+
+12. Open your application's configuration page again and navigate to the **Static files** part. Click on *URL* and add `/static/`. Then click on the *Enter path* next to it and add the location of your STATIC_ROOT dir e.g `/home/testcalendar/demo-clinic-system/static`
+
+13. Reload your app. Now it should load your static files and your site should appear as it was during development.
 

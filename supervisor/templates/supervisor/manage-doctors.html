@@ -55,8 +55,13 @@
         </div>
 
         <br>
-        <!-- Submit Button -->
-        <button type="button" id="assign-docs" class="btn btn-outline-primary">Assign Doctors</button>  
+
+        <!-- Submit and View Assignments button -->
+        <div class="btn-group" style="position:absolute; bottom:15px; left:auto; margin:0; padding:5px 3px;">
+                <button type="button" id="assign-docs" class="btn btn-outline-primary">Assign Doctors</button>
+                <button type="button" id="admin-btn" class="btn btn-outline-primary float-right ">View Assignments</button>  
+        </div>
+          
     </div>
   
     <!-- Doctor Table -->
@@ -75,6 +80,10 @@
 
 {% block scripts %}
 <script>
+    document.getElementById("admin-btn").onclick = function () {
+        location.href = "/admin/supervisor/doctorassignment/";
+    };
+
     var ajax_doctors;
     $(document).ready(function () {
 
@@ -160,15 +169,7 @@
                     $("#clinic-li-" + li_id.toString()).remove();   // removing clinic from Selected Clinics list
                     $("#clinic-col-" + li_id.toString()).remove();  // removing clinic heading from table
                     
-                    if (clinicName == "G-10/2") {
-                        $('.G-10-2').remove();
-                    }
-                    else if (clinicName == "Blue Area") {
-                        $('.Blue-Area').remove();
-                    }
-                    else if (clinicName == "F-10") {
-                        $('.F-10').remove(); 
-                    }
+                    $('.' + clinicName.replace(/\s+|[,\/]/g, "-")).remove();
                 });
 
                 $("#heading").append(
@@ -199,16 +200,7 @@
 
         for(let i = 0; i < clinics.length; ++i) {
 
-            let class_attr = "";
-            if (clinics[i] == "G-10/2") {
-                class_attr = "G-10-2";
-            }
-            else if (clinics[i] == "Blue Area") {
-                class_attr = "Blue-Area";
-            }
-            else {
-                class_attr = "F-10";
-            }
+            let class_attr = clinics[i].replace(/\s+|[,\/]/g, "-");
 
             checkbox_str += '<div class="cell ' +
             class_attr + '" ' +
@@ -229,9 +221,11 @@
     $(document).ready(function () {
         $("#assign-docs").click(function(e) {
             
+            let docs_selected = false;
             $(".cell input:checked").each(function() {
                 let clinic = $(this).parent().attr('data-clinic-name');
                 let doc = $(this).parent().parent().first().text();
+                docs_selected = true;
 
                 $.ajax({
                     type: 'POST',
@@ -244,10 +238,20 @@
             });
             
             $('input[type=checkbox]').prop('checked', false);   // uncheck all checkboxes in the table
-            dialog.alert({
-                message: "Assignments performed succesfully",
-                animation: "fade",
-            });
+            
+            if (docs_selected) {
+                dialog.alert({
+                    message: "Assignments performed succesfully",
+                    animation: "fade",
+                });
+            }
+            else {
+                dialog.alert({
+                    message: "You did not select any doctors!",
+                    animation: "fade",
+                });
+            }
+            
         });
     });
 
