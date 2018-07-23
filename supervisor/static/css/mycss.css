@@ -1,4 +1,5 @@
-.col-centered{
+.col-centered
+{
     margin: 0 auto;
     float: none;
 }
@@ -16,3 +17,10 @@
 {
   margin-right:0.5rem;
 }
+
+.form-control:focus {
+
+    position: relative;
+ 
+ }
+

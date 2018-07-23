@@ -7,11 +7,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 
-@login_required
+# @login_required
 def manageDoctors(request):
     clinics = Clinic.objects.all()
     doctors = Doctor.objects.all()
     return render(request, 'supervisor/manage-doctors.html', {'clinics':clinics, 'doctors':doctors})
+
+# @login_required
+def clinicDay(request):
+    clinics = Clinic.objects.all()
+    doctors = Doctor.objects.all()
+    return render(request, 'supervisor/clinic-day.html', {'clinics':clinics, 'doctors':doctors})
 
 
 def getDoctors(request):
@@ -26,7 +32,6 @@ def saveDoctorAssignment(request):
 
         doc_obj = Doctor.objects.filter(doctor_name=doctor).first();
         cli_obj = Clinic.objects.filter(clinic_name=clinic).first();
-
 
         DoctorAssignment(doctor_name=doc_obj, clinic_name=cli_obj).save()
         

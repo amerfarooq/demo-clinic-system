@@ -58,8 +58,8 @@
 
         <!-- Submit and View Assignments button -->
         <div class="btn-group" style="position:absolute; bottom:15px; left:auto; margin:0; padding:5px 3px;">
-                <button type="button" id="assign-docs" class="btn btn-outline-primary">Assign Doctors</button>
-                <button type="button" id="admin-btn" class="btn btn-outline-primary float-right ">View Assignments</button>  
+            <button type="button" id="assign-docs" class="btn btn-outline-primary">Assign Doctors</button>
+            <button type="button" id="admin-btn" class="btn btn-outline-primary float-right ">View Assignments</button>  
         </div>
           
     </div>
@@ -165,7 +165,7 @@
                 $(".rem-btn").click(function () {
                     var li_id = $(this).attr('data-id');
                     var clinicName = $("#clinic-li-" + li_id.toString()).attr('data-clinic');
-                    clinics.splice(clinics.indexOf(clinicName), 1);
+                    clinics.splice(clinics.indexOf(clinicName), 1); // removing clinic from clinics array
                     $("#clinic-li-" + li_id.toString()).remove();   // removing clinic from Selected Clinics list
                     $("#clinic-col-" + li_id.toString()).remove();  // removing clinic heading from table
                     

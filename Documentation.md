@@ -1,4 +1,6 @@
-​		
+# Django
+
+# 		
 
 ### Starting a Django project
 
@@ -280,6 +282,69 @@ class Doctor(models.Model):
 ```
 
 This will show up new Doctor objects as "Doctor Name Speciality" e.g. `Amer Farooq - Chiro` 
+
+### Deploying the Django web application on pythonanywhere.com
+
+---
+
+First, create an account on pythonanywhere.com and log in. This will take you to the dashboard. From there, follow the succeeding steps for deployment:
+
+1. Open a new bash console from the ***Consoles*** tab.
+
+2. Make sure your application is uploaded to github. Now when the console appears, perform a `git clone <github link>`
+
+3. Next, create a new virtual environment in the bash console by typing `mkvirtualenv --python=/usr/bin/python3.6 myenv2 ` . The version of Python you provide should be the same version you used to develop your application.  Here `myenv2` is the name of the virtual environment.
+
+4. If the virtual environment was successfully created, the bash console should now have something like `(myenv2) 05:21 ~ $ ` appended to it. Here `05:21` can be any number. Now install Django by typing `pip install django`.  Any extra extensions can either be manually installed via pip or you can create a `requirements.txt` file in which you list these extensions and place it in the root of your project directory. You can then use the command `pip install -r requirements.txt` to install them.
+
+5. After Django finishes installing, head over the ***Web*** tab in the pythonanywhere dashboard. Next, click on `Add a new web app`.
+
+6. Click next and on the ***Select a Python Web framework*** window, click on `Manual Configuration`. Choose your version of python and proceed to the end. You will then end up on your application's configuration page.
+
+7. Scroll down to the **Virtualenv** part of the page and enter the name of the virtual environment you created in step 3. Hit the checkmark box and pythonanywhere will locate and add the virtual environment.
+
+8. Now scroll up to the **Code** part on the same page and click on `WSGI configuration file`. Doing so will open the configuration file in a text editor in the browser. Remove the extra stuff from this file so that you only end up with: 
+
+   ```python
+   import os
+   import sys
+   
+   path = '/home/testcalendar/demo-clinic-system'
+   if path not in sys.path:
+       sys.path.append(path)
+   
+   os.environ['DJANGO_SETTINGS_MODULE'] = 'clinic.settings'
+   
+   from django.core.wsgi import get_wsgi_application
+   application = get_wsgi_application()
+   
+   ```
+
+   Here, two things need to be edited. 
+
+   + `path = '/home/testcalendar/demo-clinic-system'` should point to the main folder of your web application. You can located this folder through the bash console by using `ls` and `pwd`. The main folder is the one containing your `manage.py` file.
+   + `os.environ['DJANGO_SETTINGS_MODULE'] = 'clinic.settings'` . Here, use the name of your project so it looks like `your-project-name.settings` instead. This name is the one you used in the **Starting a Django Project**, the first section of this documentation.
+
+    Now click on the **Save** button or use CTRL + S. Then, navigate back to your apps configuration page  and click on the `reload <app>` button at the top.
+
+9. Next, get your application domain from your configuration page e.g. `testcalendar.pythonanywhere.com` Now, open the **Files** tab in the pythonanywhere dashboard and navigate to your application's `settings.py` file. Here, add the copied domain to the `ALLOWED_HOSTS` so it looks like: 
+
+   ```python
+   ALLOWED_HOSTS = ['your-domain.pythonanywhere.com']
+   ```
+
+10. Reload your app again and then try to open the web application through the above domain. If you end up on an error page, check the error logs to see what went wrong and rectify the issue from there. 
+
+11. When your application finally opens, you will see your web page but without any sort of styling. To fix this, head over to the bash console and type `python manage.py collectstatic`. This will collect all your static files in the `STATIC_ROOT` directory that was defined in the ***How to add HTML pages to a Django app***. 
+
+12. Open your application's configuration page again and navigate to the **Static files** part. Click on *URL* and add `/static/`. Then click on the ***Enter path*** next to it and add the location of your STATIC_ROOT directory e.g `/home/testcalendar/demo-clinic-system/static`
+
+13. Reload your app. Now it should load your static files and your site should appear as it was during development.
+
+14. If you want to update the app, simply do a push onto your git repository, followed by a `git pull` from the bash console. There also exist methods to automate this so that whenever something is pushed on the repo, the web app gets updated automatically.
+
+
+# Supervisor ( /supervisor )
 
 
 
@@ -645,8 +710,6 @@ Whenever we add a new clinic to the 'Selected Clinics' list, we give it an id: `
 
 
 
-
-
 The new functionality in particular is this:
 
 ```javascript
@@ -671,61 +734,15 @@ $(".rem-btn").click(function () {
 
 
 
-### Deploying a Django web application on pythonanywhere.com
+### Assigning the selected doctors to the selected clinics
 
 ---
 
-First, navigate to p
 
-1. Open a new bash console from the ***Consoles*** tab.
 
-2. Make sure your application is uploaded to github. Now when the console appears, perform a `git clone <github link>`
 
-3. Next, create a new virtual environment in the bash console by typing `mkvirtualenv --python=/usr/bin/python3.6 myenv2 ` . The version of Python you provide should be the same version you used to develop your application.  Here `myenv2` is the name of the virtual environment.
 
-4. If the virtual environment was successfully created, the bash console should now have something like `(myenv2) 05:21 ~ $ ` appended to it. Here `05:21` can be any number. Now install Django by typing `pip install django`.  Any extra extensions can either be manually installed via pip or you can create a `requirements.txt` file in which you list these extensions and place it in the root of your project directory. You can then use the command `pip install -r requirements.txt` to install them.
 
-5. After Django finishes installing, head over the ***Web*** tab in the pythonanywhere dashboard. Next, click on `Add a new web app`.
 
-6. Click next and on the ***Select a Python Web framework*** window, click on `Manual Configuration`. Choose your version of python and proceed to the end. You will then end up on your application's configuration page.
 
-7. Scroll down to the **Virtualenv** part of the page and enter the name of the virtual environment you created in step 3. Hit the checkmark box and pythonanywhere will locate and add the virtual environment.
-
-8. Now scroll up to the **Code** part on the same page and click on `WSGI configuration file`. Doing so will open the configuration file in a text editor in the browser. Remove the extra stuff from this file so that you only end up with: 
-
-   ```python
-   import os
-   import sys
-   
-   path = '/home/testcalendar/demo-clinic-system'
-   if path not in sys.path:
-       sys.path.append(path)
-   
-   os.environ['DJANGO_SETTINGS_MODULE'] = 'clinic.settings'
-   
-   from django.core.wsgi import get_wsgi_application
-   application = get_wsgi_application()
-   
-   ```
-
-   Here, two things need to be edited. 
-
-   + `path = '/home/testcalendar/demo-clinic-system'` should point to the main folder of your web application. You can located this folder through the bash console by using `ls` and `pwd`. The main folder is the one containing your `manage.py` file.
-   + `os.environ['DJANGO_SETTINGS_MODULE'] = 'clinic.settings'` . Here, use the name of your project so it looks like `your-project-name.settings` instead. This name is the one you used in the **Starting a Django Project**, the first section of this documentation.
-
-    Now click on the **Save** button or use CTRL + S. Then, navigate back to your apps configuration page  and click on the `reload <app>` button at the top.
-
-9. Next, get your application domain from your configuration page e.g. `testcalendar.pythonanywhere.com` Now, open the **Files** tab in the pythonanywhere dashboard and navigate to your application's `settings.py` file. Here, add the copied domain to the `ALLOWED_HOSTS` so it looks like: 
-
-   ```python
-   ALLOWED_HOSTS = ['your-domain.pythonanywhere.com']
-   ```
-
-10. Reload your app again and then try to open the web application through the above domain. If you end up on an error page, check the error logs to see what went wrong and rectify the issue from there. 
-
-11. When your application finally opens, you will see your web page but without any sort of styling. To fix this, head over to the bash console and type `python manage.py collectstatic`. This will collect all your static files in the `STATIC_ROOT` directory that was defined in the ***How to add HTML pages to a Django app***. 
-
-12. Open your application's configuration page again and navigate to the **Static files** part. Click on *URL* and add `/static/`. Then click on the *Enter path* next to it and add the location of your STATIC_ROOT dir e.g `/home/testcalendar/demo-clinic-system/static`
-
-13. Reload your app. Now it should load your static files and your site should appear as it was during development.
-
+# Clinic Day View ( /supervisor/clinic )

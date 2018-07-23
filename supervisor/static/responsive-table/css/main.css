@@ -108,12 +108,11 @@ iframe {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  padding: 10px 30px;
+  padding: 33px 30px;
 }
 
 .wrap-table100 {
   width: 960px;
-  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -188,6 +187,7 @@ iframe {
   padding-top: 20px;
   padding-bottom: 20px;
   border-bottom: 1px solid #f2f2f2;
+  border: 1px dotted transparent;
 }
 
 .row.header .cell {
@@ -223,10 +223,6 @@ iframe {
   width: 100% !important;
 }
 
-.row:hover {
-  background-color: #ececff;
-  cursor: pointer;
-}
 
 @media (max-width: 768px) {
   .row {
@@ -258,4 +254,4 @@ iframe {
   .table, .row, .cell {
     width: 100% !important;
   }
-}
+} 

@@ -1,0 +1,148 @@
+{% extends "supervisor/base.html" %} 
+{% load widget_tweaks %} 
+
+{% block pageTitle %}
+    <title>Clinic Day View</title>   
+{% endblock %} 
+
+{% block pageHeading %}
+    <h4 align="center">Clinic Day View</h4>
+    <hr>
+{% endblock %} 
+
+
+{% block content %}
+<div style="display: flex; justify-content: space-evenly">
+    
+    <!-- Doctor Table -->
+    <div class="wrap-table100" style="border-radius: 0px">
+        <div class="table">
+            <div class="row header" id="heading">
+                <div class="cell">Doctor</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="width: 17rem">
+            
+        <div class="card border-dark w-150">
+                <div class="card-header">Doctor Filter</div>
+                <div class="card-body">
+                    
+                    <div class="input-group input-group-sm ">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Speciality</span>
+                        </div>
+                        <select class="form-control" id="speciality-select">
+                            <option disabled selected value id="def-val-spec"> --- </option>
+                            <option>Medical</option>
+                            <option>ACCU</option>
+                            <option>PT</option>
+                            <option>Chiro</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group input-group-sm ">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Availibility</span>
+                        </div>
+                        <select class="form-control" id="availibility-select">
+                        </select>
+                    </div>
+
+                    <div class="input-group input-group-sm ">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Name</span>
+                        </div>
+                        <select class="form-control" id="name-select">
+                        </select>
+                    </div>
+                </div>
+        </div>     
+        
+        <br><br>
+        
+        <div class="card border-dark w-150">
+            <div class="card-header">Clinic Filter</div>
+            <div class="card-body">
+                <div class="input-group input-group-sm ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Name</span>
+                    </div>
+                    <select class="form-control pull-right" id="clinic-select-name">
+                        <option id="def-val-clinic" disabled selected value> --- </option>
+                        {% for clinic in clinics %}
+                            <option>{{ clinic.clinic_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            
+                <div class="input-group input-group-sm ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Area</span>
+                    </div>
+                    <select class="form-control pull-right">
+                    </select>
+                </div>
+
+                <div class="input-group input-group-sm ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Address</span>
+                    </div>
+                    <select class="form-control pull-right">
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade tableModal" id="my" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Entry</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+            <form class="form-inline">
+                <label>Start: </label>
+                <div class="form-row">
+                    <div class="col-md-6">
+                         <input type="date" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="time" class="form-control">
+                    </div>
+                </div>
+                <label>End: </label>
+                <div class="form-row">
+                    <div class="col-md-6">
+                         <input type="date" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="time" class="form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-primary">More Options</button>
+            <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Update</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %} 
+
+
+{% block scripts %}
+    {% load static %}
+    <script src="{% static 'js/clinic-day.js' %}"></script>
+{% endblock %}
