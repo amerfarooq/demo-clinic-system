@@ -1,6 +1,6 @@
 from django.db import models
 
-
+#models as in tables
 class Patient(models.Model):
     patient_name = models.CharField(max_length=128)
     date_of_birth = models.DateField()
