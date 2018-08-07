@@ -1,6 +1,6 @@
 # Django
 
-# 		
+		
 
 ### Starting a Django project
 
@@ -274,7 +274,7 @@ class Doctor(models.Model):
         ('Medical', 'Medical'),
         ('PT', 'PT'),
     )
-    doctor_speciality = models.CharField(max_length=20, choices=DOC_SPECIALITIES, 		default='PT')
+    doctor_speciality = models.CharField(max_length=20, choices=DOC_SPECIALITIES, default='PT')
 
     def __str__(self):
         return f'{self.doctor_name} - {self.doctor_speciality}'
@@ -525,9 +525,9 @@ var clinic_list_index = 1;
            
             $("#clinic_list").append(
                 '<li data-clinic="' + selected_clinic.toString() + 
-                '" class="list-group-item list-group-item-action " id="clinic-li-'+ 						(clinic_list_index).toString() + '">' +
-                selected_clinic + 
-                '<button class=' + '"button button-circle button-caution button-tiny float-					right"' + 
+                '" class="list-group-item list-group-item-action " id="clinic-li-'+ (clinic_list_index).toString() + '">' +
+                 selected_clinic + 
+                '<button class=' + '"button button-circle button-caution button-tiny float-right"' + 
                 ' type="button" id="rem-btn-' + clinic_list_index.toString() + 
                 '" data-id="' + clinic_list_index.toString() + '">' +
                 '<i class="fas fa-times"></i>' +
@@ -584,7 +584,7 @@ $("#clinic_list").append(
     '<li data-clinic="' + selected_clinic.toString() + 
         '" class="list-group-item list-group-item-action" id="clinic-li-'+ 						(clinic_list_index).toString() + '">' +
         selected_clinic + 
-        '<button class=' + '"button button-circle button-caution button-tiny 						float-right"' + 
+        '<button class=' + '"button button-circle button-caution button-tiny float-right"' + 
          ' type="button" id="rem-btn-' + clinic_list_index.toString() + 
          '" data-id="' + clinic_list_index.toString() + '">' +
         '<i class="fas fa-times"></i>' +
@@ -651,18 +651,19 @@ To accomplish this, a counter is used to assign the clinic and its corresponding
             
                 $("#clinic_list").append(
                     '<li data-clinic="' + selected_clinic.toString() + 
-                    '" class="list-group-item list-group-item-action " id="clinic-li-'+ 						(clinic_list_index).toString() + '">' +
+                    '" class="list-group-item list-group-item-action " id="clinic-li-'+ (clinic_list_index).toString() + '">' +
                     selected_clinic + 
-                    '<button class =' + '"button button-circle button-caution button-tiny 						float-right rem-btn"' + 
+                    '<button class =' + '"button button-circle button-caution button-tiny 							     float-right rem-btn"' + 
                     ' type="button"' + 
                     'data-id="' + clinic_list_index.toString() + '">' +
                     '<i class="fas fa-times"></i>' +
                     "</li>"
                 )
                 
-			   //------------
+		//------------
                 // New section
                 //------------
+		
                 $(".rem-btn").click(function () {
                     var li_id = $(this).attr('data-id');
                     var clinicName = $("#clinic-li-" + li_id.toString()).attr('data-clinic');
@@ -695,7 +696,7 @@ $("#clinic_list").append(
     '<li data-clinic="' + selected_clinic.toString() + 
     '" class="list-group-item list-group-item-action " id="clinic-li-'+ 					(clinic_list_index).toString() + '">' +
     selected_clinic + 
-    '<button class =' + '"button button-circle button-caution button-tiny 					float-right rem-btn"' + 
+    '<button class =' + '"button button-circle button-caution button-tiny float-right rem-btn"' + 
     ' type="button"' + 
     'data-id="' + clinic_list_index.toString() + '">' +
     '<i class="fas fa-times"></i>' +
