@@ -339,7 +339,7 @@ First, create an account on pythonanywhere.com and log in. This will take you to
 
 11. When your application finally opens, you will see your web page but without any sort of styling. To fix this, head over to the bash console and type `python manage.py collectstatic`. This will collect all your static files in the `STATIC_ROOT` directory that was defined in the ***How to add HTML pages to a Django app***. 
 
-12. Open your application's configuration page again and navigate to the **Static files** part. Click on *URL* and add `/static/`. Then click on the ***Enter path*** next to it and add the location of your STATIC_ROOT directory e.g `/home/testcalendar/demo-clinic-system/static`
+12. Open your application's configuration page again and navigate to the **Static files** part. Click on *URL* and add `/static/`. Then click on the ***Enter path*** next to it and add the location of your STATIC_ROOT directory e.g `/home/testcalendar/demo-clinic-system/static` Static root can be assigned as following: 'STATIC_ROOT = os.path.join(BASE_DIR, "static")'
 
 13. Reload your app. Now it should load your static files and your site should appear as it was during development.
 
